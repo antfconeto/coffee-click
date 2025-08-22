@@ -1,0 +1,170 @@
+{
+    "header": {
+        "logo": {
+            "brand": "Coffee Click"
+        },
+        "navigation": {
+            "home": "Início",
+            "products": "Produtos",
+            "contacts": "Contatos",
+            "social": "Social"
+        },
+        "user": {
+            "defaultName": "Usuário"
+        },
+        "languageSelector": {
+            "title": "Idioma",
+            "en": "Inglês",
+            "pt": "Português",
+            "dropdown": {
+                "title": "Selecione o idioma",
+                "description": "Escolha seu idioma preferido para a aplicação"
+            }
+        }
+    },
+    "pages": {
+        "home": {
+            "title": "Cafés Premium",
+            "description": "Página inicial",
+            "sections":{
+                "premiumCoffees": {
+                    "title": "Cafés Premium",
+                    "description": "Descubra os melhores grãos de café cultivados com carinho e tradição, selecionados especialmente para os verdadeiros apreciadores"
+                },
+                "CardsPremiumCoffees": {
+                    "card1": {
+                        "title": "Qualidade Garantida",
+                        "description": "Todos os nossos cafés passam por rigoroso controle de qualidade, desde a seleção dos grãos até a torra final"
+                    },
+                    "card2": {
+                        "title": "Origem Única",
+                        "description": "Cada café tem sua origem específica, garantindo características únicas e sabores inconfundíveis de cada região"
+                    },
+                    "card3": {
+                        "title": "Torra Artesanal",
+                        "description": "Processo de torra cuidadosamente controlado para extrair o melhor sabor e aroma de cada variedade de grão"
+                    }
+                },
+                "availableCoffees": {
+                    "title": "Cafés Disponíveis",
+                    "description": "Descubra nossa seleção de cafés frescos e de qualidade",
+                    "noCoffees": "Nenhum café disponível no momento",
+                    "viewAll": "Ver Todos os Cafés"
+                },
+                "cta": {
+                    "button": "Explorar Todos os Cafés",
+                    "description": "Descubra nossa coleção completa de cafés premium e especiais"
+                },
+                "tryAgain": {
+                    "button": "Tentar novamente"
+                }
+            }
+        },
+        "coffee": {
+            "create": {
+                "title": "Cadastrar Novo Café",
+                "subtitle": "Adicione um novo café à nossa coleção premium",
+                "sections": {
+                    "basicInfo": {
+                        "title": "Informações Básicas",
+                        "fields": {
+                            "name": {
+                                "label": "Nome do Café *",
+                                "placeholder": "Ex: Café Bourbon Especial"
+                            },
+                            "origin": {
+                                "label": "Origem *",
+                                "placeholder": "Ex: Serra da Mantiqueira, MG"
+                            },
+                            "roastLevel": {
+                                "label": "Nível de Torra *",
+                                "options": {
+                                    "light": "Clara",
+                                    "medium": "Média",
+                                    "dark": "Escura"
+                                }
+                            },
+                            "price": {
+                                "label": "Preço *",
+                                "placeholder": "0.00"
+                            },
+                            "weight": {
+                                "label": "Peso *",
+                                "placeholder": "0.0"
+                            },
+                            "stockQuantity": {
+                                "label": "Quantidade em Estoque *",
+                                "placeholder": "0"
+                            },
+                            "description": {
+                                "label": "Descrição *",
+                                "placeholder": "Descreva as características, sabor, aroma e história do café..."
+                            },
+                            "isAvailable": {
+                                "label": "Disponível para venda"
+                            },
+                            "categories": {
+                                "label": "Categorias",
+                                "placeholder": "Pesquisar categorias...",
+                                "searchPlaceholder": "Digite para pesquisar categorias",
+                                "noResults": "Nenhuma categoria encontrada",
+                                "selected": "Categorias selecionadas - Máximo 3"
+                            }
+                        },
+                        "units": {
+                            "weight": {
+                                "g": "g",
+                                "kg": "kg",
+                                "oz": "oz",
+                                "lb": "lb"
+                            },
+                            "currency": {
+                                "BRL": "R$",
+                                "USD": "$",
+                                "EUR": "€"
+                            }
+                        }
+                    },
+                    "media": {
+                        "title": "Mídia do Café",
+                        "selected": "📹 {count} arquivo{plural} selecionado{plural}"
+                    },
+                    "actions": {
+                        "cancel": "Cancelar",
+                        "create": "Criar Café",
+                        "creating": "Criando...",
+                        "withMedia": "({count} arquivo{plural})"
+                    }
+                },
+                "messages": {
+                    "mediaRequired": "Por favor, selecione pelo menos uma imagem ou vídeo para o café.",
+                    "error": "Erro ao criar o café. Tente novamente."
+                }
+            }
+        }
+    },
+    "common": {
+        "loading": "Preparando o seu café...",
+        "error": "Erro",
+        "success": "Sucesso",
+        "mediaUpload": {
+            "dropZone": {
+                "title": "Arraste e solte suas imagens e vídeos aqui",
+                "subtitle": "ou clique para selecionar arquivos",
+                "info": "Máximo {maxMedia} arquivos • Imagens: 5MB • Vídeos: 100MB",
+                "button": "Selecionar Mídia"
+            },
+            "validation": {
+                "title": "Erros de validação:",
+                "maxFiles": "Máximo de {maxMedia} arquivos de mídia permitidos",
+                "fileSize": "Arquivo {index} excede {maxSize}MB",
+                "invalidType": "Arquivo {index} não é um tipo válido"
+            },
+            "preview": {
+                "title": "Mídia Selecionada ({count}/{maxMedia})",
+                "error": "Erro",
+                "retry": "Tentar novamente"
+            }
+        }
+    }
+}

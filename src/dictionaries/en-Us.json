@@ -1,0 +1,170 @@
+{
+    "header": {
+        "logo": {
+            "brand": "Coffee Click US"
+        },
+        "navigation": {
+            "home": "Home",
+            "products": "Products",
+            "contacts": "Contacts",
+            "social": "Social"
+        },
+        "user": {
+            "defaultName": "User"
+        },
+        "languageSelector": {
+            "title": "Language",
+            "en": "English",
+            "pt": "Portuguese",
+            "dropdown": {
+                "title": "Select Language",
+                "description": "Choose your preferred language for the application"
+            }
+        }
+    },
+    "pages": {
+        "home": {
+            "title": "Home",
+            "description": "Home page",
+            "sections":{
+                "premiumCoffees": {
+                    "title": "Premium Coffees",
+                    "description": "Discover the best coffee beans grown with care and tradition, selected especially for true connoisseurs"
+                },
+                "CardsPremiumCoffees": {
+                    "card1": {
+                        "title": "Quality Guaranteed    ",
+                        "description": "All our coffees undergo rigorous quality control, from the selection of beans to the final roast"
+                    },
+                    "card2": {
+                        "title": "Unique Origin",
+                        "description": "Each coffee has its own specific origin, ensuring unique and unmistakable flavors from each region"
+                    },
+                    "card3": {
+                        "title": "Sustainability",
+                        "description": "We are committed to sustainable practices, from the selection of beans to the final roast"
+                    }
+                },
+                "availableCoffees": {
+                    "title": "Available Coffees",
+                    "description": "Discover our selection of fresh and quality coffees",
+                    "noCoffees": "No coffees available at the moment",
+                    "viewAll": "View All Coffees"
+                },
+                "cta": {
+                    "button": "Explore All Coffees",
+                    "description": "Discover our complete collection of premium and special coffees"
+                },
+                "tryAgain": {
+                    "button": "Try Again"
+                }
+            }
+        },
+        "coffee": {
+            "create": {
+                "title": "Register New Coffee",
+                "subtitle": "Add a new coffee to our premium collection",
+                "sections": {
+                    "basicInfo": {
+                        "title": "Basic Information",
+                        "fields": {
+                            "name": {
+                                "label": "Coffee Name *",
+                                "placeholder": "Ex: Special Bourbon Coffee"
+                            },
+                            "origin": {
+                                "label": "Origin *",
+                                "placeholder": "Ex: Serra da Mantiqueira, MG"
+                            },
+                            "roastLevel": {
+                                "label": "Roast Level *",
+                                "options": {
+                                    "light": "Light",
+                                    "medium": "Medium",
+                                    "dark": "Dark"
+                                }
+                            },
+                            "price": {
+                                "label": "Price *",
+                                "placeholder": "0.00"
+                            },
+                            "weight": {
+                                "label": "Weight *",
+                                "placeholder": "0.0"
+                            },
+                            "stockQuantity": {
+                                "label": "Stock Quantity *",
+                                "placeholder": "0"
+                            },
+                            "description": {
+                                "label": "Description *",
+                                "placeholder": "Describe the characteristics, flavor, aroma and history of the coffee..."
+                            },
+                            "isAvailable": {
+                                "label": "Available for sale"
+                            },
+                            "categories": {
+                                "label": "Categories",
+                                "placeholder": "Search categories...",
+                                "searchPlaceholder": "Type to search categories",
+                                "noResults": "No categories found",
+                                "selected": "Selected categories - Max 3"
+                            }
+                        },
+                        "units": {
+                            "weight": {
+                                "g": "g",
+                                "kg": "kg",
+                                "oz": "oz",
+                                "lb": "lb"
+                            },
+                            "currency": {
+                                "BRL": "R$",
+                                "USD": "$",
+                                "EUR": "€"
+                            }
+                        }
+                    },
+                    "media": {
+                        "title": "Coffee Media",
+                        "selected": "📹 {count} file{plural} selected"
+                    },
+                    "actions": {
+                        "cancel": "Cancel",
+                        "create": "Create Coffee",
+                        "creating": "Creating...",
+                        "withMedia": "({count} file{plural})"
+                    }
+                },
+                "messages": {
+                    "mediaRequired": "Please select at least one image or video for the coffee.",
+                    "error": "Error creating coffee. Please try again."
+                }
+            }
+        }
+    },
+    "common": {
+        "loading": "Loading...",
+        "error": "Error",
+        "success": "Success",
+        "mediaUpload": {
+            "dropZone": {
+                "title": "Drag and drop your images and videos here",
+                "subtitle": "or click to select files",
+                "info": "Maximum {maxMedia} files • Images: 5MB • Videos: 100MB",
+                "button": "Select Media"
+            },
+            "validation": {
+                "title": "Validation errors:",
+                "maxFiles": "Maximum of {maxMedia} media files allowed",
+                "fileSize": "File {index} exceeds {maxSize}MB",
+                "invalidType": "File {index} is not a valid type"
+            },
+            "preview": {
+                "title": "Selected Media ({count}/{maxMedia})",
+                "error": "Error",
+                "retry": "Retry"
+            }
+        }
+    }
+}

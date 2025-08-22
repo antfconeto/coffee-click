@@ -1,0 +1,58 @@
+@import "tailwindcss/preflight";
+@tailwind utilities;
+
+/* Custom slider styles */
+.slider-custom::-webkit-slider-thumb {
+  appearance: none;
+  height: 24px;
+  width: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
+  cursor: pointer;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  transition: all 0.3s ease;
+}
+
+.slider-custom::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+}
+
+.slider-custom::-webkit-slider-thumb:active {
+  transform: scale(0.95);
+}
+
+.slider-custom::-moz-range-thumb {
+  height: 24px;
+  width: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
+  cursor: pointer;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  transition: all 0.3s ease;
+}
+
+.slider-custom::-moz-range-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+}
+
+.slider-custom::-moz-range-thumb:active {
+  transform: scale(0.95);
+}
+
+.slider-custom::-webkit-slider-track {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(to right, #fef3c7, #fed7aa);
+  border: 1px solid #fbbf24;
+}
+
+.slider-custom::-moz-range-track {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(to right, #fef3c7, #fed7aa);
+  border: 1px solid #fbbf24;
+}
