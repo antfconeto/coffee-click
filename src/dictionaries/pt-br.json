@@ -65,6 +65,13 @@
                 "title": "Cadastrar Novo Café",
                 "subtitle": "Adicione um novo café à nossa coleção premium",
                 "sections": {
+                    "stepper": [
+                        "Informações Básicas",
+                        "Preço e Medidas",
+                        "Estoque",
+                        "Descrição e Categorias",
+                        "Upload de Mídia"
+                    ],
                     "basicInfo": {
                         "title": "Informações Básicas",
                         "fields": {

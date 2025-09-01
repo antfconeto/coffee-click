@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from "next/image";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { LoadingState } from '../loaders/loader-state';
 
 interface SlideInfo {
   title?: string;
@@ -30,6 +31,8 @@ interface CarrouselProps {
   supportVideos?: boolean;
 }
 
+
+
 export function Carrousel({
   images,
   slidesInfo = [],
@@ -46,43 +49,52 @@ export function Carrousel({
 }: CarrouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Função para detectar se é vídeo ou imagem
   const isVideo = useCallback((url: string) => {
     if (!supportVideos) return false;
     const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
     return videoExtensions.some(ext => url.toLowerCase().includes(ext)) || 
-           url.includes('blob:') || // Para vídeos gravados
-           url.includes('data:video'); // Para vídeos em base64
+           url.includes('blob:') || 
+           url.includes('data:video'); 
   }, [supportVideos]);
 
 
 
-  // Navegação para o próximo slide
   const nextSlide = useCallback(() => {
     setCurrentIndex((prevIndex) => 
       prevIndex === images.length - 1 ? 0 : prevIndex + 1
     );
   }, [images.length]);
 
-  // Navegação para o slide anterior
   const prevSlide = useCallback(() => {
     setCurrentIndex((prevIndex) => 
       prevIndex === 0 ? images.length - 1 : prevIndex - 1
     );
   }, [images.length]);
 
-  // Navegação direta para um slide específico
   const goToSlide = useCallback((index: number) => {
     setCurrentIndex(index);
   }, []);
 
-  // Pausar/retomar autoplay
   const togglePlayPause = useCallback(() => {
     setIsPlaying(prev => !prev);
   }, []);
 
-  // Efeito para autoplay
+  // Controla o estado de loading
+  useEffect(() => {
+    if (images === undefined) {
+      setIsLoading(true);
+    } else {
+      // Simula um pequeno delay para mostrar o loading
+      const loadingTimer = setTimeout(() => {
+        setIsLoading(false);
+      }, 800);
+      
+      return () => clearTimeout(loadingTimer);
+    }
+  }, [images]);
+
   useEffect(() => {
     if (!isPlaying || !autoPlay) return;
 
@@ -93,7 +105,6 @@ export function Carrousel({
     return () => clearInterval(timer);
   }, [isPlaying, autoPlay, interval, nextSlide]);
 
-  // Pausar autoplay quando o mouse está sobre o carrossel
   const handleMouseEnter = useCallback(() => {
     if (autoPlay) setIsPlaying(false);
   }, [autoPlay]);
@@ -102,24 +113,27 @@ export function Carrousel({
     if (autoPlay) setIsPlaying(true);
   }, [autoPlay]);
 
-  // Verificar se há imagens
+  // Estado de loading
+  if (isLoading) {
+    return <LoadingState width={width} height={height} className={className} />;
+  }
+
   if (!images || images.length === 0) {
     return (
-      <div className={`relative w-full h-64 md:h-96 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-amber-900/20 dark:to-amber-800/20 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-amber-700/50 ${className}`}>
+      <div className={`relative w-full h-64 md:h-96 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-amber-900/20 dark:to-amber-800/20 rounded-2xl flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-amber-700/50 shadow-inner ${className}`}>
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gray-300 dark:bg-amber-700/30 rounded-full flex items-center justify-center">
-            <svg className="w-8 h-8 text-gray-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-gray-300 to-gray-400 dark:from-amber-700/30 dark:to-amber-800/30 rounded-2xl flex items-center justify-center shadow-lg">
+            <svg className="w-10 h-10 text-gray-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-          <p className="text-gray-500 dark:text-amber-400 font-medium">Nenhuma imagem disponível</p>
-          <p className="text-gray-400 dark:text-amber-500/70 text-sm">Adicione imagens para visualizar o carrossel</p>
+          <h3 className="text-lg font-semibold text-gray-600 dark:text-amber-400 mb-2">Nenhuma imagem disponível</h3>
+          <p className="text-gray-500 dark:text-amber-500/70 text-sm">Adicione imagens deliciosas para visualizar o carrossel</p>
         </div>
       </div>
     );
   }
 
-  // Componente do card de informações para cada slide
   const SlideInfoCard = ({ info, isVisible }: { info: SlideInfo | null; isVisible: boolean }) => {
     if (!info || !showInfoCard) return null;
 
@@ -239,7 +253,6 @@ export function Carrousel({
     );
   };
 
-  // Renderizar apenas o slide atual para melhor performance
   const renderCurrentSlide = () => {
     const mediaUrl = images[currentIndex];
     const slideInfo = slidesInfo[currentIndex] || null;
@@ -259,7 +272,6 @@ export function Carrousel({
             onLoadedMetadata={(e) => {
               const video = e.target as HTMLVideoElement;
               video.play().catch(() => {
-                // Ignora erros de autoplay
               });
             }}
           />
@@ -285,121 +297,115 @@ export function Carrousel({
 
   return (
     <div 
-      className={`relative ${width} group `}
+      className={`relative ${width} group ${className}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {/* Container principal do carrossel */}
-      <div className={`relative ${height} rounded-2xl overflow-hidden scroll-smooth bg-gray-100 dark:bg-amber-950/20`}>
+      <div className={`relative ${height} rounded-2xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-amber-950/30 dark:to-amber-900/30 shadow-xl border border-gray-200/50 dark:border-amber-800/30 backdrop-blur-sm transition-all duration-300 group-hover:shadow-2xl group-hover:scale-[1.02]`}>
         {/* Renderizar apenas o slide atual */}
         {renderCurrentSlide()}
 
-        {/* Contador de slides */}
-        <div className="absolute top-4 right-4  bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium">
-          {currentIndex + 1} / {images.length}
+        {/* Contador de slides melhorado */}
+        <div className="absolute top-4 right-4 bg-gradient-to-r from-black/60 to-black/70 backdrop-blur-md text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg border border-white/20 transition-all duration-300 hover:from-amber-600/80 hover:to-amber-700/80">
+          <span className="text-amber-300">{currentIndex + 1}</span>
+          <span className="text-white/70 mx-1">de</span>
+          <span className="text-white">{images.length}</span>
         </div>
 
-        {/* Indicador de tipo de mídia */}
+        {/* Indicador de tipo de mídia melhorado */}
         {supportVideos && isVideo(images[currentIndex]) && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2  bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-black-600/80 to-black-700/80 backdrop-blur-md text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 shadow-lg border border-white/20">
+            <svg className="w-4 h-4 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
             <span>Vídeo</span>
           </div>
         )}
 
-        {/* Botão de play/pause */}
+        {/* Botão de play/pause melhorado */}
         {autoPlay && (
           <button
             onClick={togglePlayPause}
-            className="absolute top-4 left-4  bg-black/50 backdrop-blur-sm text-white p-2 rounded-full hover:bg-black/70 transition-all duration-300 group/play"
+            className="absolute top-4 left-4 bg-gradient-to-r from-black/60 to-black/70 backdrop-blur-md text-white p-3 rounded-full hover:from-amber-600/80 hover:to-amber-700/80 transition-all duration-300 transform hover:scale-110 shadow-lg border border-white/20 group/play"
             aria-label={isPlaying ? 'Pausar slideshow' : 'Retomar slideshow'}
           >
             {isPlaying ? (
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 group-hover/play:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
               </svg>
             ) : (
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 group-hover/play:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z" />
               </svg>
             )}
           </button>
         )}
 
-        {/* Botão de play/pause para vídeos */}
-        {supportVideos && isVideo(images[currentIndex]) && (
-          <button
-            onClick={() => {
-              const videoElement = document.querySelector(`video[src="${images[currentIndex]}"]`) as HTMLVideoElement;
-              if (videoElement) {
-                if (videoElement.paused) {
-                  videoElement.play().catch(() => {
-                    // Ignora erros de autoplay
-                  });
-                } else {
-                  videoElement.pause();
-                }
-              }
-            }}
-            className="absolute top-16 left-4 z-10 bg-black/50 backdrop-blur-sm text-white p-2 rounded-full hover:bg-black/70 transition-all duration-300"
-            aria-label="Play/Pause vídeo"
-          >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </button>
-        )}
 
-        {/* Botões de navegação */}
+
+        {/* Botões de navegação melhorados */}
         {showArrows && images.length > 1 && (
           <>
             <button
               onClick={prevSlide}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 backdrop-blur-sm text-white p-3 rounded-full hover:bg-black/70 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-gradient-to-r from-black/60 to-black/70 backdrop-blur-md text-white p-4 rounded-full hover:from-amber-600/80 hover:to-amber-700/80 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 shadow-xl border border-white/20 group/nav"
               aria-label="Slide anterior"
             >
-              <FiChevronLeft className="w-5 h-5" />
+              <FiChevronLeft className="w-6 h-6 group-hover/nav:scale-110 transition-transform" />
             </button>
             
             <button
               onClick={nextSlide}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 backdrop-blur-sm text-white p-3 rounded-full hover:bg-black/70 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-gradient-to-r from-black/60 to-black/70 backdrop-blur-md text-white p-4 rounded-full hover:from-amber-600/80 hover:to-amber-700/80 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 shadow-xl border border-white/20 group/nav"
               aria-label="Próximo slide"
             >
-              <FiChevronRight className="w-5 h-5" />
+              <FiChevronRight className="w-6 h-6 group-hover/nav:scale-110 transition-transform" />
             </button>
           </>
         )}
       </div>
 
-      {/* Indicadores */}
+      {/* Indicadores melhorados */}
       {showIndicators && images.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex space-x-2">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex space-x-3 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
           {images.map((_, index) => (
             <button
               key={`carousel-indicator-${index}`}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              className={`w-3 h-3 rounded-full transition-all duration-300 transform relative ${
                 index === currentIndex
-                  ? 'bg-white scale-125 shadow-lg'
-                  : 'bg-white/50 hover:bg-white/75 hover:scale-110'
+                  ? 'bg-gradient-to-r from-amber-400 to-amber-500 scale-150 shadow-lg ring-2 ring-white/50'
+                  : 'bg-white/60 hover:bg-white/90 hover:scale-125 hover:shadow-md'
               }`}
               aria-label={`Ir para slide ${index + 1}`}
               aria-current={index === currentIndex}
-            />
+            >
+              {index === currentIndex && (
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-500 rounded-full animate-pulse" />
+              )}
+            </button>
           ))}
         </div>
       )}
 
-      {/* Barra de progresso do autoplay */}
+      {/* Barra de progresso melhorada do autoplay */}
       {autoPlay && isPlaying && (
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
+        <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r from-black/20 to-black/30 backdrop-blur-sm">
           <div 
-            className="h-full bg-white transition-all duration-100 ease-linear"
+            className="h-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 transition-all duration-100 ease-linear shadow-lg"
             style={{ 
-              width: `${((currentIndex + 1) / images.length) * 100}%` 
+              width: `${((currentIndex + 1) / images.length) * 100}%`,
+              boxShadow: '0 0 10px rgba(245, 158, 11, 0.5)'
+            }}
+          />
+          {/* Indicador de progresso em tempo real */}
+          <div 
+            className="absolute top-0 h-full w-1 bg-white rounded-full shadow-lg"
+            style={{
+              left: `${((currentIndex + 1) / images.length) * 100}%`,
+              transform: 'translateX(-50%)',
+              boxShadow: '0 0 8px rgba(255, 255, 255, 0.8)'
             }}
           />
         </div>

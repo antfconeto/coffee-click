@@ -88,7 +88,7 @@ export default function HomePage() {
                   date: coffee.createdAt,
                   currency: coffee.currency,
                   weight: coffee.weight,
-                  weightUnit: coffee.weightUnit,
+                  weightUnit: coffee.weightUnit
                 }))}
               />
             </div>

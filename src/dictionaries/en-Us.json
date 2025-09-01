@@ -65,6 +65,13 @@
                 "title": "Register New Coffee",
                 "subtitle": "Add a new coffee to our premium collection",
                 "sections": {
+                    "stepper": [
+                        "Basic Information",
+                        "Price and Measures",
+                        "Stock",
+                        "Description and Categories",
+                        "Media"
+                    ],
                     "basicInfo": {
                         "title": "Basic Information",
                         "fields": {
