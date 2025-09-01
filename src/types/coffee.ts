@@ -12,11 +12,15 @@ export type Coffee = {
     seller: Seller;
     isAvailable: boolean;
     stockQuantity: number;
+    review: Review;
     medias: Media[];
     createdAt: string;
     updatedAt: string;
 }
-
+export type Review = {
+    reviews:{id:string; comment:string; rating:number}[]
+    globalRating:number;
+}
 export type Seller = {
     id: string;
     name: string;

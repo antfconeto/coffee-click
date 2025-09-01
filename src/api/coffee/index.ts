@@ -205,6 +205,7 @@ export const coffeeApi = {
       name: 'Categoria mockada'
     }];
   },
+
   async listCoffeeByUserId(userId: string, limit: number, nextToken: string): Promise<ListCoffeesResponse> {
     if (!userId || !limit) {
       console.error('userId, limit e nextToken são obrigatórios');
@@ -265,6 +266,76 @@ export const coffeeApi = {
     const data = await response.json();
     console.log(`Response in listCoffeeByUserId`, data);
     return data.data.listCoffeesByUserId;
-  }
-}
+  },
 
+  async listCoffeeByRating(limit: number, minRating: number, nextToken: string): Promise<{items: Coffee[], nextToken: string}> {
+    if (!limit) {
+      console.error('limit e nextToken são obrigatórios');
+      throw new Error('limit e nextToken são obrigatórios');
+    }
+      const query = `
+          query MyQuery($limit: Int = 10, $minRating: Float = 1.5, $nextToken: String = "") {
+            listCoffeeByRating(limit: $limit, minRating: $minRating, nextToken: $nextToken) {
+              nextToken
+              items {
+                createdAt
+                categories {
+                  description
+                  icon
+                  id
+                  name
+                }
+                currency
+                description
+                id
+                isAvailable
+                medias {
+                  mediaType
+                  id
+                  mediaUrl
+                }
+                name
+                origin
+                price
+                review {
+                  globalRating
+                  reviews {
+                    comment
+                    id
+                    rating
+                  }
+                }
+                roastLevel
+                seller {
+                  id
+                  name
+                  photoUrl
+                }
+                stockQuantity
+                updatedAt
+                weight
+                weightUnit
+              }
+            }
+          }`
+      const response = await fetch(GRAPHQL_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'undefined',
+          'Content-Type': 'application/json',
+          'User-Agent': 'insomnia/11.3.0',
+          'x-action': 'listCoffeeByRating'
+        },
+        body: JSON.stringify({ query, variables: { limit, minRating, nextToken } })
+      });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log(`Response in listCoffeeByRating`, data);
+    return data.data.listCoffeeByRating ?? {items: [], nextToken: ''};
+  }
+
+}

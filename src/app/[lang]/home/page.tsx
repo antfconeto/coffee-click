@@ -10,6 +10,8 @@ import LoaderCookie from '@/components/ui/loaders/coffee-loader';
 import { Carrousel } from '@/components/ui/carrousels/carrousel';
 import { useDictionary } from '@/hooks/useDictionary';
 import { useEffect, useState } from 'react';
+import { Coffee as CoffeeType } from '@/types/coffee';
+import { coffeeApi } from '@/api/coffee';
 
 export default function HomePage() {
   const router = useRouter();
@@ -22,7 +24,19 @@ export default function HomePage() {
     addToCart,
     refetch
   } = useCoffees();
+
+  const [premiumCoffees, setPremiumCoffees] = useState<{coffees:CoffeeType[], isLoading:boolean}>({coffees:[], isLoading:true});
+  
   const { dictionary } = useDictionary();
+
+  useEffect(() => {
+    fetchPremiumCoffees();
+  }, []);
+
+  const fetchPremiumCoffees = async () => {
+    const response = await coffeeApi.listCoffeeByRating(10, 4.0, '');
+    setPremiumCoffees({coffees:response.items ?? [], isLoading:false});
+  }
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -56,73 +70,26 @@ export default function HomePage() {
             {/* Carrossel de cafés premium */}
             <div className="mb-16 flex items-center justify-center  mr-auto ml-auto">
               <Carrousel
-                images={['/home/coffee1.jpg', '/home/coffee2.jpg', '/home/coffee3.jpg', '/home/coffee4.jpg']}
+                images={premiumCoffees.coffees.map((coffee) => coffee.medias[0].mediaUrl)}
                 height="h-120"
                 width="w-210"
                 showInfoCard={true}
                 infoCardOpacity={0.001}
-                slidesInfo={[
-                  {
-                    title: 'Café Bourbon Especial',
-                    description: 'Grãos selecionados da variedade Bourbon, cultivados na altitude de 1200m na Serra da Mantiqueira. Processo natural que preserva o sabor único e aroma característico.',
-                    tags: ['Bourbon', 'Altitude', 'Natural'],
-                    author: 'Fazenda do Vale',
-                    date: '2024',
-                    location: 'Serra da Mantiqueira, MG',
-                    rating: 4.8,
-                    customFields: {
-                      'Altitude': '1200m',
-                      'Variedade': 'Bourbon',
-                      'Processo': 'Natural',
-                      'Torra': 'Média'
-                    }
-                  },
-                  {
-                    title: 'Café Catuaí Premium',
-                    description: 'Café de origem única da Chapada Diamantina, com notas de chocolate amargo, caramelo e um toque cítrico. Torra artesanal que realça a complexidade dos sabores.',
-                    tags: ['Catuaí', 'Origem Única', 'Artesanal'],
-                    author: 'Café do Brasil',
-                    date: '2024',
-                    location: 'Chapada Diamantina, BA',
-                    rating: 4.9,
-                    customFields: {
-                      'Região': 'Chapada',
-                      'Clima': 'Tropical',
-                      'Solo': 'Vermelho',
-                      'Torra': 'Média-Escura'
-                    }
-                  },
-                  {
-                    title: 'Café Catuaí Premium',
-                    description: 'Café de origem única da Chapada Diamantina, com notas de chocolate amargo, caramelo e um toque cítrico. Torra artesanal que realça a complexidade dos sabores.',
-                    tags: ['Catuaí', 'Origem Única', 'Artesanal'],
-                    author: 'Café do Brasil',
-                    date: '2024',
-                    location: 'Chapada Diamantina, BA',
-                    rating: 4.9,
-                    customFields: {
-                      'Região': 'Chapada',
-                      'Clima': 'Tropical',
-                      'Solo': 'Vermelho',
-                      'Torra': 'Média-Escura'
-                    }
-                  },
-                  {
-                    title: 'Café Acaia Especial',
-                    description: 'Grãos da variedade Acaia cultivados organicamente, com processo de lavagem que preserva a acidez brilhante e notas florais. Perfeito para métodos de filtro.',
-                    tags: ['Acaia', 'Orgânico', 'Lavado'],
-                    author: 'Fazenda Orgânica',
-                    date: '2024',
-                    location: 'Sul de Minas, MG',
-                    rating: 4.7,
-                    customFields: {
-                      'Certificação': 'Orgânico',
-                      'Processo': 'Lavado',
-                      'Acidez': 'Brilhante',
-                      'Corpo': 'Médio'
-                    }
-                  }
-                ]}
+                supportVideos={true}
+                slidesInfo={premiumCoffees.coffees.map((coffee) => ({
+                  title: coffee.name,
+                  description: coffee.description,
+                  rating: coffee.review.globalRating,
+                  reviews: coffee.review.reviews.length,
+                  price: coffee.price,
+                  author: coffee.seller.name,
+                  location: coffee.origin,
+                  tags: coffee.categories.map((category) => category.name),
+                  date: coffee.createdAt,
+                  currency: coffee.currency,
+                  weight: coffee.weight,
+                  weightUnit: coffee.weightUnit,
+                }))}
               />
             </div>
   
