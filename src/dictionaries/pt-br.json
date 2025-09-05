@@ -76,14 +76,17 @@
                         "title": "Informações Básicas",
                         "fields": {
                             "name": {
+                                "title": "Nome do Café",
                                 "label": "Nome do Café *",
                                 "placeholder": "Ex: Café Bourbon Especial"
                             },
                             "origin": {
+                                "title": "Origem",
                                 "label": "Origem *",
                                 "placeholder": "Ex: Serra da Mantiqueira, MG"
                             },
                             "roastLevel": {
+                                "title": "Nível de Torra",
                                 "label": "Nível de Torra *",
                                 "options": {
                                     "light": "Clara",
@@ -92,25 +95,35 @@
                                 }
                             },
                             "price": {
+                                "title": "Preço",
                                 "label": "Preço *",
                                 "placeholder": "0.00"
                             },
+                            "priceWeight":{
+                                "title": "Preço e Peso",
+                                "label": "Preço e Peso"
+                            },
                             "weight": {
+                                "title": "Peso",
                                 "label": "Peso *",
                                 "placeholder": "0.0"
                             },
                             "stockQuantity": {
+                                "title": "Quantidade em Estoque",
                                 "label": "Quantidade em Estoque *",
                                 "placeholder": "0"
                             },
                             "description": {
+                                "title": "Descrição",
                                 "label": "Descrição *",
                                 "placeholder": "Descreva as características, sabor, aroma e história do café..."
                             },
                             "isAvailable": {
+                                "title": "Disponível para venda",
                                 "label": "Disponível para venda"
                             },
                             "categories": {
+                                "title": "Categorias",
                                 "label": "Categorias",
                                 "placeholder": "Pesquisar categorias...",
                                 "searchPlaceholder": "Digite para pesquisar categorias",
@@ -170,7 +183,27 @@
             "preview": {
                 "title": "Mídia Selecionada ({count}/{maxMedia})",
                 "error": "Erro",
-                "retry": "Tentar novamente"
+                "retry": "Tentar novamente",
+                "video": "Vídeo",
+                "pause": "Pausar",
+                "play": "Retomar",
+                "previous": "Slide anterior",
+                "next": "Próximo slide",
+                "goToSlide": "Ir para slide"
+            }
+        },
+        "carrousel": {
+            "preview": {
+                "title": "Mídia Selecionada ({count}/{maxMedia})",
+                "description": "Selecione a mídia para o carrossel",
+                "error": "Erro",
+                "retry": "Tentar novamente",
+                "video": "Vídeo",
+                "pause": "Pausar",
+                "play": "Retomar",
+                "previous": "Slide anterior",
+                "next": "Próximo slide",
+                "goToSlide": "Ir para slide"
             }
         }
     }

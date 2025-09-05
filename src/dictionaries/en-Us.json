@@ -92,25 +92,35 @@
                                 }
                             },
                             "price": {
+                                "title": "Price",
                                 "label": "Price *",
                                 "placeholder": "0.00"
                             },
+                            "priceWeight":{
+                                "title": "Price and Weight",
+                                "label": "Price and Weight"
+                            },
                             "weight": {
+                                "title": "Weight",
                                 "label": "Weight *",
                                 "placeholder": "0.0"
                             },
                             "stockQuantity": {
+                                "title": "Stock Quantity",
                                 "label": "Stock Quantity *",
                                 "placeholder": "0"
                             },
                             "description": {
+                                "title": "Description",
                                 "label": "Description *",
                                 "placeholder": "Describe the characteristics, flavor, aroma and history of the coffee..."
                             },
                             "isAvailable": {
+                                "title": "Available for sale",
                                 "label": "Available for sale"
                             },
                             "categories": {
+                                "title": "Categories",
                                 "label": "Categories",
                                 "placeholder": "Search categories...",
                                 "searchPlaceholder": "Type to search categories",
@@ -170,8 +180,28 @@
             "preview": {
                 "title": "Selected Media ({count}/{maxMedia})",
                 "error": "Error",
-                "retry": "Retry"
+                "retry": "Retry",
+                "video": "Video",
+                "pause": "Pause",
+                "play": "Play",
+                "previous": "Previous slide",
+                "next": "Next slide",
+                "goToSlide": "Go to slide"
             }
+        },
+        "carrousel": {
+            "preview": {
+                "title": "Selected Media ({count}/{maxMedia})",
+                "description": "Select the media for the carousel",
+                "error": "Error",
+                "retry": "Retry",
+                "video": "Video",
+            "pause": "Pause",
+            "play": "Play",
+            "previous": "Previous slide",
+            "next": "Next slide",
+            "goToSlide": "Go to slide"
         }
+    }
     }
 }

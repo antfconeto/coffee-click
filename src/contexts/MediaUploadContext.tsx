@@ -14,6 +14,7 @@ interface MediaUploadContextType {
   clearMedia: () => void;
   validateMedia: () => string[];
   retryUpload: (mediaId: string) => Promise<boolean>;
+  setMediaFromUrls: (mediaUrls: Array<{id: string, mediaUrl: string, mediaType: 'PHOTO' | 'VIDEO'}>) => void;
 }
 
 const MediaUploadContext = createContext<MediaUploadContextType | undefined>(undefined);

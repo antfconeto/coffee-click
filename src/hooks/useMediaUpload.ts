@@ -201,28 +201,52 @@ export const useMediaUpload = () => {
       return [];
     }
     
+    // Separar mídias que precisam ser uploadadas vs mídias já existentes
+    const mediasToUpload = media.filter(m => m.status !== 'completed');
+    const completedMedias = media.filter(m => m.status === 'completed');
+    
+    console.log(`📊 Media analysis: ${mediasToUpload.length} to upload, ${completedMedias.length} already completed`);
+    
     try {
-      const uploadPromises = media.map(async (mediaFile, index) => {
-        console.log(`📤 Uploading media ${index + 1}/${media.length}:`, mediaFile.file.name);
-        
-        try {
-          console.log("mediaFile", mediaFile);
-          const mediaUrl = await uploadToS3(mediaFile);
-          console.log(`✅ Media ${index + 1} uploaded successfully:`, mediaUrl);
-          
-          return {
-            id: mediaFile.id,
-            mediaType: mediaFile.mediaType,
-            mediaUrl: mediaUrl,
-            s3Key: mediaFile.s3Key
-          };
-        } catch (error) {
-          console.error(`❌ Error uploading media ${index + 1}:`, error);
-          throw error;
-        }
+      const results: UploadResult[] = [];
+      
+      // Adicionar mídias já completadas diretamente ao resultado
+      completedMedias.forEach(mediaFile => {
+        console.log(`✅ Media already completed: ${mediaFile.id}`);
+        results.push({
+          id: mediaFile.id,
+          mediaType: mediaFile.mediaType,
+          mediaUrl: mediaFile.s3Key || mediaFile.preview, // Usar s3Key se disponível, senão preview
+          s3Key: mediaFile.s3Key
+        });
       });
+      
+      // Upload apenas das mídias pendentes
+      if (mediasToUpload.length > 0) {
+        const uploadPromises = mediasToUpload.map(async (mediaFile, index) => {
+          console.log(`📤 Uploading media ${index + 1}/${mediasToUpload.length}:`, mediaFile.file.name);
+          
+          try {
+            console.log("mediaFile", mediaFile);
+            const mediaUrl = await uploadToS3(mediaFile);
+            console.log(`✅ Media ${index + 1} uploaded successfully:`, mediaUrl);
+            
+            return {
+              id: mediaFile.id,
+              mediaType: mediaFile.mediaType,
+              mediaUrl: mediaUrl,
+              s3Key: mediaFile.s3Key
+            };
+          } catch (error) {
+            console.error(`❌ Error uploading media ${index + 1}:`, error);
+            throw error;
+          }
+        });
 
-      const results = await Promise.all(uploadPromises);
+        const uploadedResults = await Promise.all(uploadPromises);
+        results.push(...uploadedResults);
+      }
+      
       console.log('🎉 All uploads completed successfully:', results);
       return results;
       
@@ -288,6 +312,26 @@ export const useMediaUpload = () => {
     }
   }, [media, uploadToS3]);
 
+  const setMediaFromUrls = useCallback((mediaUrls: Array<{id: string, mediaUrl: string, mediaType: 'PHOTO' | 'VIDEO'}>) => {
+    console.log('📥 Setting media from existing URLs:', mediaUrls);
+    
+    const mediaFiles: MediaFile[] = mediaUrls.map((mediaItem) => ({
+      id: mediaItem.id,
+      file: new File([], `existing-${mediaItem.mediaType.toLowerCase()}-${mediaItem.id}`, {
+        type: mediaItem.mediaType === 'PHOTO' ? 'image/jpeg' : 'video/mp4'
+      }),
+      preview: mediaItem.mediaUrl,
+      uploadProgress: 100,
+      status: 'completed' as const,
+      s3Key: mediaItem.mediaUrl,
+      mediaType: mediaItem.mediaType,
+      thumbnail: mediaItem.mediaType === 'VIDEO' ? mediaItem.mediaUrl : undefined
+    }));
+    
+    console.log('📄 Created media files:', mediaFiles);
+    setMedia(mediaFiles);
+  }, []);
+
   return {
     media,
     isUploading,
@@ -298,6 +342,7 @@ export const useMediaUpload = () => {
     uploadAllMedia,
     clearMedia,
     validateMedia,
-    retryUpload
+    retryUpload,
+    setMediaFromUrls
   };
 };

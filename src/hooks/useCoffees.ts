@@ -21,7 +21,7 @@ export function useCoffees() {
       setLoading(true);
       setError(null);
       
-      const response = await coffeeApi.listCoffees(user?.token);
+      const response = await coffeeApi.listCoffees();
       setCoffees(response.listCoffees.items || []);
     } catch (err:  unknown) {
       console.error('Erro ao buscar cafés:', err);

@@ -17,12 +17,10 @@ export async function getDictionary(lang: string): Promise<Dictionary> {
     return dictionaries[normalizedLang as SupportedLanguages];
   }
   
-  // Fallback para inglês se o idioma não for suportado
   return dictionaries['en-US'];
 }
 
 function normalizeLanguage(lang: string): string {
-  // Normaliza diferentes formatos de idioma
   const normalized = lang.toLowerCase().replace('_', '-');
   
   if (normalized.startsWith('pt')) {
@@ -33,7 +31,7 @@ function normalizeLanguage(lang: string): string {
     return 'en-US';
   }
   
-  return 'en-US'; // Fallback padrão
+  return 'en-US';
 }
 
 export function getSupportedLanguages(): SupportedLanguages[] {

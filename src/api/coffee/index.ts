@@ -336,6 +336,185 @@ export const coffeeApi = {
     const data = await response.json();
     console.log(`Response in listCoffeeByRating`, data);
     return data.data.listCoffeeByRating ?? {items: [], nextToken: ''};
+  },
+
+  async getCoffeeById(id: string): Promise<Coffee> {
+    const query = `
+      query GetCoffee($id: ID!) {
+        getCoffee(coffeeId: $id) {
+          categories {
+            icon
+            description
+            id
+            name
+          }
+          createdAt
+          currency
+          description
+          id
+          isAvailable
+          medias {
+            mediaType
+            id
+            mediaUrl
+          }
+          name
+          origin
+          price
+          review {
+            globalRating
+            reviews {
+              comment
+              id
+              rating
+            }
+          }
+          roastLevel
+          seller {
+            id
+            name
+            photoUrl
+          }
+          stockQuantity
+          updatedAt
+          weight
+          weightUnit
+        }
+      }
+    `;
+
+    const response = await fetch(GRAPHQL_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'undefined',
+        'Content-Type': 'application/json',
+        'User-Agent': 'insomnia/11.3.0',
+        'x-action': 'getCoffee'
+      },
+      body: JSON.stringify({ query, variables: { id } })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log('Response in getCoffee', data);
+    
+    if (!data.data?.getCoffee) {
+      throw new Error('Café não encontrado');
+    }
+    
+    console.log('Response in getCoffee', data);
+    return data.data.getCoffee;
+  },
+
+  async updateCoffee(id: string, coffee: Partial<Coffee>, token:string): Promise<Coffee> {
+    console.log('Coffee recebido para atualização:', coffee);
+
+    // Mapear apenas os campos válidos para CoffeeInput
+    const coffeeInput = {
+      id: coffee.id,
+      name: coffee.name,
+      description: coffee.description,
+      origin: coffee.origin,
+      roastLevel: coffee.roastLevel,
+      price: coffee.price,
+      currency: coffee.currency,
+      weight: coffee.weight,
+      weightUnit: coffee.weightUnit,
+      categories: coffee.categories?.map(cat => ({
+        id: cat.id,
+        icon: cat.icon,
+        description: cat.description,
+        name: cat.name
+      })),
+      seller: coffee.seller ? {
+        id: coffee.seller.id,
+        name: coffee.seller.name,
+        photoUrl: coffee.seller.photoUrl
+      } : undefined,
+      isAvailable: coffee.isAvailable,
+      stockQuantity: coffee.stockQuantity,
+      medias: coffee.medias?.map(media => ({
+        id: media.id,
+        mediaUrl: media.mediaUrl,
+        mediaType: media.mediaType
+      }))
+    };
+
+    console.log('CoffeeInput mapeado para atualização:', coffeeInput);
+
+    const query = `
+      mutation UpdateCoffee($input: CoffeeInput!) {
+        updateCoffee(coffee: $input) {
+          categories {
+            icon
+            description
+            id
+            name
+          }
+          createdAt
+          currency
+          description
+          id
+          isAvailable
+          medias {
+            mediaType
+            id
+            mediaUrl
+          }
+          name
+          origin
+          price
+          review {
+            globalRating
+            reviews {
+              comment
+              id
+              rating
+            }
+          }
+          roastLevel
+          seller {
+            id
+            name
+            photoUrl
+          }
+          stockQuantity
+          updatedAt
+          weight
+          weightUnit
+        }
+      }
+    `;
+
+    console.log('token', token);
+    const response = await fetch(GRAPHQL_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'undefined',
+        'Content-Type': 'application/json',
+        'User-Agent': 'insomnia/11.3.0',
+        'x-action': 'updateCoffee'
+      },
+      body: JSON.stringify({ query, variables: { input: coffeeInput } })
+    });
+
+
+    if (!response.ok) {
+      console.log('Error in updateCoffee', await response.json());
+      throw new Error(`Erro na requisição: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    
+    if (data.errors) {
+      throw new Error(data.errors[0]?.message || 'Erro ao atualizar café');
+    }
+    
+    console.log('Response in updateCoffee', data);
+    return data.data.updateCoffee;
   }
 
 }

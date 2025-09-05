@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { Header } from '@/components/layout/header/Header';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { MediaUpload } from '@/components/ui/media-upload/MediaUpload';
@@ -9,8 +10,9 @@ import { FiCoffee, FiPlus, FiX, FiArrowLeft, FiArrowRight, FiCheck } from 'react
 import { coffeeApi } from '@/api/coffee';
 import { Category, Coffee } from '@/types/coffee';
 import { useDictionary } from '@/hooks/useDictionary';
+import { LoadingState } from '@/components/ui/loaders/loader-state';
 
-// Step Components - Moved outside main component to prevent re-creation on re-render
+// Step Components - Reutilizando da página create
 interface StepProps {
   formData: Coffee;
   handleInputChange: (field: keyof Coffee, value: string | number | boolean) => void;
@@ -92,7 +94,7 @@ const Step2PriceWeight: React.FC<Pick<StepProps, 'formData' | 'handleInputChange
   <div className="bg-white dark:bg-amber-950/50 rounded-2xl p-6 border border-gray-200 dark:border-amber-700/50">
     <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
       <FiCoffee className="mr-2 text-amber-600" />
-      {dictionary.pages.coffee.create.sections.basicInfo.fields.priceWeight.title}
+      {dictionary.pages.coffee.create.sections.priceWeight.title}
     </h2>
     
     <div className="grid md:grid-cols-2 gap-6">
@@ -163,7 +165,7 @@ const Step3Stock: React.FC<Pick<StepProps, 'formData' | 'handleInputChange' | 'd
   <div className="bg-white dark:bg-amber-950/50 rounded-2xl p-6 border border-gray-200 dark:border-amber-700/50">
     <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
       <FiCoffee className="mr-2 text-amber-600" />
-      Estoque e Disponibilidade
+      {dictionary.pages.coffee.create.sections.stock.title}
     </h2>
     
     <div className="space-y-6">
@@ -212,7 +214,7 @@ const Step4Description: React.FC<Pick<StepProps, 'formData' | 'handleInputChange
   <div className="bg-white dark:bg-amber-950/50 rounded-2xl p-6 border border-gray-200 dark:border-amber-700/50">
     <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
       <FiCoffee className="mr-2 text-amber-600" />
-      Descrição e Categorias
+      {dictionary.pages.coffee.create.sections.description.title}
     </h2>
     
     <div className="space-y-6">
@@ -345,10 +347,14 @@ const Step5Media: React.FC<Pick<StepProps, 'dictionary' | 'media' | 'getPlural'>
   </div>
 );
 
-export default function CreateCoffeePage() {
+export default function UpdateCoffeePage() {
   const router = useRouter();
+  const params = useParams();
+  const coffeeId = params.id as string;
   const { user } = useAuthContext();
   const { dictionary, loading: dictLoading } = useDictionary();
+  const [coffee, setCoffee] = useState<Coffee | null>(null);
+  const [isLoadingCoffee, setIsLoadingCoffee] = useState(true);
   const [formData, setFormData] = useState<Coffee>({
     name: '',
     description: '',
@@ -387,8 +393,34 @@ export default function CreateCoffeePage() {
   const {
     media,
     uploadAllMedia,
-    clearMedia
+    clearMedia,
+    setMediaFromUrls
   } = useMediaUploadContext();
+
+  useEffect(() => {
+    const loadCoffee = async () => {
+      if (!coffeeId) return;
+      
+      try {
+        setIsLoadingCoffee(true);
+        const coffeeData = await coffeeApi.getCoffeeById(coffeeId);
+        setCoffee(coffeeData);
+        setFormData(coffeeData);
+        
+        // Carrega as mídias existentes no contexto
+        if (coffeeData.medias && coffeeData.medias.length > 0) {
+          setMediaFromUrls(coffeeData.medias);
+        }
+      } catch (error) {
+        console.error('❌ Erro ao carregar o café:', error);
+        router.push('/pt/home');
+      } finally {
+        setIsLoadingCoffee(false);
+      }
+    };
+
+    loadCoffee();
+  }, [coffeeId, router]);
 
   const handleInputChange = (field: keyof Coffee, value: string | number | boolean) => {
     setFormData(prev => ({
@@ -488,49 +520,67 @@ export default function CreateCoffeePage() {
     };
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
+    e?.preventDefault();
+    
+    // Prevenir submit automático se não estivermos no último step ou se está submetendo
+    if (currentStep !== totalSteps || isSubmitting) {
+      console.log('🚫 Submit bloqueado - Step:', currentStep, 'Submitting:', isSubmitting);
+      return;
+    }
+    
     if (!media || media.length === 0) {
       alert(dictionary?.pages.coffee.create.messages.mediaRequired || 'Por favor, selecione pelo menos uma imagem ou vídeo para o café.');
       return;
     }
+    
+    console.log('✅ Iniciando update do café...');
     setIsSubmitting(true);
     try {
       const uploadedMedia = await uploadAllMedia();
       const coffeeData = {
         ...formData,
-        seller: {
-          id: user?.uid || '',
-          name: user?.displayName || '',
-          photoUrl: user?.photoURL || ''
-        },
-        medias: uploadedMedia
+        medias: uploadedMedia,
+        updatedAt: new Date().toISOString()
       };
-      const response = await coffeeApi.createCoffee(coffeeData as unknown as Coffee);
-      clearMedia();
+      
+      await coffeeApi.updateCoffee(coffeeId, coffeeData, user?.token || '');
       router.push('/pt/home');
     } catch (error) {
-      console.error('❌ Error creating coffee:', error);
-      alert(dictionary?.pages.coffee.create.messages.error || 'Erro ao criar o café. Tente novamente.');
+      console.error('❌ Error updating coffee:', error);
+      alert(dictionary?.pages.coffee.create.messages.error || 'Erro ao atualizar o café. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (dictLoading || !dictionary) {
+  if (dictLoading || !dictionary || isLoadingCoffee) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-amber-950/20 flex items-center justify-center">
+        <LoadingState width="w-96" height="h-64" />
+      </div>
+    );
+  }
+
+  if (!coffee) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-amber-950/20 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-amber-200">{dictionary?.common.loading || 'Carregando...'}</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            Café não encontrado
+          </h2>
+          <button
+            onClick={() => router.push('/pt/home')}
+            className="px-6 py-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 transition-colors"
+          >
+            Voltar ao início
+          </button>
         </div>
       </div>
     );
   }
 
   const getPlural = (count: number) => count !== 1 ? 's' : '';
-
-
 
   // Progress indicator component
   const ProgressIndicator = () => (
@@ -585,10 +635,10 @@ export default function CreateCoffeePage() {
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            {dictionary.pages.coffee.create.title}
+            Editar Café: {coffee.name}
           </h1>
           <p className="text-gray-600 dark:text-amber-200">
-            {dictionary.pages.coffee.create.subtitle}
+            Atualize as informações do seu café
           </p>
         </div>
 
@@ -660,7 +710,7 @@ export default function CreateCoffeePage() {
                 onClick={() => router.back()}
                 className="px-6 py-3 border border-gray-300 dark:border-amber-700/50 text-gray-700 dark:text-amber-200 rounded-xl hover:bg-gray-50 dark:hover:bg-amber-900/20 transition-colors"
               >
-                {dictionary.pages.coffee.create.sections.actions.cancel}
+                Cancelar
               </button>
 
               {currentStep < totalSteps ? (
@@ -675,19 +725,20 @@ export default function CreateCoffeePage() {
                 </button>
               ) : (
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={handleSubmit}
                   disabled={isSubmitting || !canProceed}
                   className="px-8 py-3 bg-amber-600 text-white rounded-xl hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
                 >
                   {isSubmitting ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                      {dictionary.pages.coffee.create.sections.actions.creating}
+                      Atualizando...
                     </>
                   ) : (
                     <>
                       <FiCheck className="mr-2" />
-                      {dictionary.pages.coffee.create.sections.actions.create}
+                      Atualizar Café
                     </>
                   )}
                 </button>

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Image from "next/image";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { LoadingState } from '../loaders/loader-state';
+import { useDictionary } from '@/hooks/useDictionary';
 
 interface SlideInfo {
   title?: string;
@@ -50,25 +51,25 @@ export function Carrousel({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [isLoading, setIsLoading] = useState(true);
-
+  const { dictionary } = useDictionary();
   const isVideo = useCallback((url: string) => {
     if (!supportVideos) return false;
     const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
-    return videoExtensions.some(ext => url.toLowerCase().includes(ext)) || 
-           url.includes('blob:') || 
-           url.includes('data:video'); 
+    return videoExtensions.some(ext => url.toLowerCase().includes(ext)) ||
+      url.includes('blob:') ||
+      url.includes('data:video');
   }, [supportVideos]);
 
 
 
   const nextSlide = useCallback(() => {
-    setCurrentIndex((prevIndex) => 
+    setCurrentIndex((prevIndex) =>
       prevIndex === images.length - 1 ? 0 : prevIndex + 1
     );
   }, [images.length]);
 
   const prevSlide = useCallback(() => {
-    setCurrentIndex((prevIndex) => 
+    setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? images.length - 1 : prevIndex - 1
     );
   }, [images.length]);
@@ -90,7 +91,7 @@ export function Carrousel({
       const loadingTimer = setTimeout(() => {
         setIsLoading(false);
       }, 800);
-      
+
       return () => clearTimeout(loadingTimer);
     }
   }, [images]);
@@ -127,8 +128,8 @@ export function Carrousel({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-gray-600 dark:text-amber-400 mb-2">Nenhuma imagem disponível</h3>
-          <p className="text-gray-500 dark:text-amber-500/70 text-sm">Adicione imagens deliciosas para visualizar o carrossel</p>
+          <h3 className="text-lg font-semibold text-gray-600 dark:text-amber-400 mb-2">{dictionary?.common.carrousel.preview.title}</h3>
+          <p className="text-gray-500 dark:text-amber-500/70 text-sm">{dictionary?.common.carrousel.preview.description}</p>
         </div>
       </div>
     );
@@ -138,19 +139,18 @@ export function Carrousel({
     if (!info || !showInfoCard) return null;
 
     return (
-      <div 
-        className={`absolute bottom-0 left-0 pb-10 right-0 transition-all duration-500 ease-in-out ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-        }`}
+      <div
+        className={`absolute bottom-0 left-0 pb-10 right-0 transition-all duration-500 ease-in-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}
       >
         {/* Gradiente de fundo com blur */}
-        <div 
+        <div
           className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent backdrop-blur-sm"
-          style={{ 
+          style={{
             background: `linear-gradient(to top, rgba(0,0,0,${infoCardOpacity}), rgba(0,0,0,${infoCardOpacity * 0.6}), transparent)`
           }}
         />
-        
+
         {/* Conteúdo do card */}
         <div className="relative p-3 z-10">
           {/* Header com título e rating */}
@@ -160,18 +160,17 @@ export function Carrousel({
                 {info.title}
               </h3>
             )}
-            
+
             {info.rating && (
               <div className="flex items-center bg-amber-500/20 px-2 py-1 rounded-full">
                 <div className="flex items-center mr-1">
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
-                      className={`w-3 h-3 ${
-                        i < Math.floor(info.rating!) 
-                          ? 'text-amber-400 fill-current' 
+                      className={`w-3 h-3 ${i < Math.floor(info.rating!)
+                          ? 'text-amber-400 fill-current'
                           : 'text-white/30'
-                      }`}
+                        }`}
                       viewBox="0 0 20 20"
                     >
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -219,14 +218,14 @@ export function Carrousel({
                 <span className="truncate">{info.author}</span>
               </div>
             )}
-            
+
             {info.location && (
               <div className="flex items-center">
                 <span className="font-medium mr-1 text-white/90">Local:</span>
                 <span className="truncate">{info.location}</span>
               </div>
             )}
-            
+
             {info.date && (
               <div className="flex items-center">
                 <span className="font-medium mr-1 text-white/90">Data:</span>
@@ -257,7 +256,7 @@ export function Carrousel({
     const mediaUrl = images[currentIndex];
     const slideInfo = slidesInfo[currentIndex] || null;
     const isVideoFile = isVideo(mediaUrl);
-    
+
     return (
       <div className="absolute inset-0">
         {isVideoFile ? (
@@ -285,18 +284,18 @@ export function Carrousel({
             sizes="(max-width: 768px) 100vw, 1200px"
           />
         )}
-        
+
         {/* Card de informações sobreposto na mídia */}
-        <SlideInfoCard 
-          info={slideInfo} 
-          isVisible={true} 
+        <SlideInfoCard
+          info={slideInfo}
+          isVisible={true}
         />
       </div>
     );
   };
 
   return (
-    <div 
+    <div
       className={`relative ${width} group ${className}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -307,28 +306,18 @@ export function Carrousel({
         {renderCurrentSlide()}
 
         {/* Contador de slides melhorado */}
-        <div className="absolute top-4 right-4 bg-gradient-to-r from-black/60 to-black/70 backdrop-blur-md text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg border border-white/20 transition-all duration-300 hover:from-amber-600/80 hover:to-amber-700/80">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-black/60 to-black/70 backdrop-blur-md text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg border border-white/20 transition-all duration-300 hover:from-amber-600/80 hover:to-amber-700/80">
           <span className="text-amber-300">{currentIndex + 1}</span>
           <span className="text-white/70 mx-1">de</span>
           <span className="text-white">{images.length}</span>
         </div>
-
-        {/* Indicador de tipo de mídia melhorado */}
-        {supportVideos && isVideo(images[currentIndex]) && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-black-600/80 to-black-700/80 backdrop-blur-md text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 shadow-lg border border-white/20">
-            <svg className="w-4 h-4 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-            <span>Vídeo</span>
-          </div>
-        )}
 
         {/* Botão de play/pause melhorado */}
         {autoPlay && (
           <button
             onClick={togglePlayPause}
             className="absolute top-4 left-4 bg-gradient-to-r from-black/60 to-black/70 backdrop-blur-md text-white p-3 rounded-full hover:from-amber-600/80 hover:to-amber-700/80 transition-all duration-300 transform hover:scale-110 shadow-lg border border-white/20 group/play"
-            aria-label={isPlaying ? 'Pausar slideshow' : 'Retomar slideshow'}
+            aria-label={isPlaying ? dictionary?.common.carrousel.preview.pause : dictionary?.common.carrousel.preview.play}
           >
             {isPlaying ? (
               <svg className="w-4 h-4 group-hover/play:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
@@ -350,15 +339,15 @@ export function Carrousel({
             <button
               onClick={prevSlide}
               className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-gradient-to-r from-black/60 to-black/70 backdrop-blur-md text-white p-4 rounded-full hover:from-amber-600/80 hover:to-amber-700/80 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 shadow-xl border border-white/20 group/nav"
-              aria-label="Slide anterior"
+              aria-label={dictionary?.common.carrousel.preview.previous}
             >
               <FiChevronLeft className="w-6 h-6 group-hover/nav:scale-110 transition-transform" />
             </button>
-            
+
             <button
               onClick={nextSlide}
               className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-gradient-to-r from-black/60 to-black/70 backdrop-blur-md text-white p-4 rounded-full hover:from-amber-600/80 hover:to-amber-700/80 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 shadow-xl border border-white/20 group/nav"
-              aria-label="Próximo slide"
+              aria-label={dictionary?.common.carrousel.preview.next}
             >
               <FiChevronRight className="w-6 h-6 group-hover/nav:scale-110 transition-transform" />
             </button>
@@ -373,12 +362,11 @@ export function Carrousel({
             <button
               key={`carousel-indicator-${index}`}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 transform relative ${
-                index === currentIndex
+              className={`w-3 h-3 rounded-full transition-all duration-300 transform relative ${index === currentIndex
                   ? 'bg-gradient-to-r from-amber-400 to-amber-500 scale-150 shadow-lg ring-2 ring-white/50'
                   : 'bg-white/60 hover:bg-white/90 hover:scale-125 hover:shadow-md'
-              }`}
-              aria-label={`Ir para slide ${index + 1}`}
+                }`}
+              aria-label={`${dictionary?.common.carrousel.preview.goToSlide} ${index + 1}`}
               aria-current={index === currentIndex}
             >
               {index === currentIndex && (
@@ -392,15 +380,15 @@ export function Carrousel({
       {/* Barra de progresso melhorada do autoplay */}
       {autoPlay && isPlaying && (
         <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r from-black/20 to-black/30 backdrop-blur-sm">
-          <div 
+          <div
             className="h-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 transition-all duration-100 ease-linear shadow-lg"
-            style={{ 
+            style={{
               width: `${((currentIndex + 1) / images.length) * 100}%`,
               boxShadow: '0 0 10px rgba(245, 158, 11, 0.5)'
             }}
           />
           {/* Indicador de progresso em tempo real */}
-          <div 
+          <div
             className="absolute top-0 h-full w-1 bg-white rounded-full shadow-lg"
             style={{
               left: `${((currentIndex + 1) / images.length) * 100}%`,

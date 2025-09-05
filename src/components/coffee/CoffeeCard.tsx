@@ -1,16 +1,73 @@
 'use client';
 
 import { Coffee } from '@/types/coffee';
-import { MapPin, Package, Star, ShoppingCart } from '@/components/icons';
+import { MapPin, Package, Star, Eye, MoreVertical, Edit, Trash } from '@/components/icons';
 import { Carrousel } from '@/components/ui/carrousels/carrousel';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 interface CoffeeCardProps {
   coffee: Coffee;
-  onAddToCart: (coffee: Coffee) => void;
+  onViewDetails?: (coffee: Coffee) => void;
+  onUpdate?: (coffee: Coffee) => void;
+  onDelete?: (coffee: Coffee) => void;
+  lang?: string;
 }
 
-export function CoffeeCard({ coffee, onAddToCart }: CoffeeCardProps) {
+export function CoffeeCard({ 
+  coffee, 
+  onViewDetails, 
+  onUpdate, 
+  onDelete, 
+  lang = 'pt-br' 
+}: CoffeeCardProps) {
+  const { user } = useAuthContext();
+  const router = useRouter();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Verificar se o usuário é dono do café
+  const isOwner = user?.uid === coffee.seller.id;
+  
+  // Fechar dropdown ao clicar fora
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+  
+  const handleViewDetails = () => {
+    if (onViewDetails) {
+      onViewDetails(coffee);
+    } else {
+      router.push(`/${lang}/coffee/${coffee.id}`);
+    }
+  };
+  
+  const handleUpdate = () => {
+    setShowDropdown(false);
+    if (onUpdate) {
+      onUpdate(coffee);
+    } else {
+      router.push(`/${lang}/coffee/${coffee.id}/update`);
+    }
+  };
+  
+  const handleDelete = () => {
+    setShowDropdown(false);
+    if (onDelete) {
+      onDelete(coffee);
+    }
+  };
   const getRoastLevelColor = (roastLevel: string) => {
     switch (roastLevel) {
       case 'light':
@@ -55,10 +112,48 @@ export function CoffeeCard({ coffee, onAddToCart }: CoffeeCardProps) {
     return `${weight}g`;
   };
 
+  const renderStars = (rating: number, reviewsCount: number) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        stars.push(
+          <Star key={i} className="h-4 w-4 text-amber-400" />
+        );
+      } else if (i === fullStars && hasHalfStar) {
+        stars.push(
+          <div key={i} className="relative h-4 w-4">
+            <Star className="h-4 w-4 text-gray-300 absolute" />
+            <div className="absolute inset-0 overflow-hidden" style={{ width: `${(rating % 1) * 100}%` }}>
+              <Star className="h-4 w-4 text-amber-400" />
+            </div>
+          </div>
+        );
+      } else {
+        stars.push(
+          <Star key={i} className="h-4 w-4 text-gray-300" />
+        );
+      }
+    }
+
+    return (
+      <div className="flex items-center space-x-1 mb-3">
+        <div className="flex items-center">
+          {stars}
+        </div>
+        <span className="text-sm text-gray-600 dark:text-amber-400 ml-2">
+          {rating.toFixed(1)} ({reviewsCount} {reviewsCount === 1 ? 'avaliação' : 'avaliações'})
+        </span>
+      </div>
+    );
+  };
+
   return (
-    <div className="bg-white dark:bg-amber-900 rounded-xl shadow-sm border border-gray-100 dark:border-amber-900 overflow-hidden hover:shadow-md transition-shadow duration-200">
+    <div className="relative bg-white dark:bg-amber-950 rounded-xl shadow-sm border border-gray-100 dark:border-amber-900 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col h-full">
       {/* Image Carousel */}
-      <div className="relative h-48 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900 dark:to-amber-900">
+      <div className="relative h-48 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950 dark:to-amber-900">
         {coffee.medias && coffee.medias.length > 0 ? (
           <div className="relative">
             <Carrousel
@@ -77,9 +172,47 @@ export function CoffeeCard({ coffee, onAddToCart }: CoffeeCardProps) {
               {getRoastLevelText(coffee.roastLevel)}
             </div>
 
+            {/* Owner Dropdown Menu */}
+            {isOwner && (
+              <div className="absolute top-3 right-3 z-30" ref={dropdownRef}>
+                <button
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  className="p-1 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200"
+                >
+                  <MoreVertical className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                </button>
+                
+                {showDropdown && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1">
+                    <button
+                      onClick={handleViewDetails}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
+                    >
+                      <Eye className="h-4 w-4" />
+                      <span>Ver Detalhes</span>
+                    </button>
+                    <button
+                      onClick={handleUpdate}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
+                    >
+                      <Edit className="h-4 w-4" />
+                      <span>Atualizar</span>
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center space-x-2"
+                    >
+                      <Trash className="h-4 w-4" />
+                      <span>Deletar</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Stock Badge */}
             {!coffee.isAvailable && (
-              <div className="absolute top-3 right-3 z-20 px-2 py-1 dark:bg-red-100 dark:text-red-800 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+              <div className={`absolute top-3 ${isOwner ? 'right-16' : 'right-3'} z-20 px-2 py-1 dark:bg-red-100 dark:text-red-800 bg-red-100 text-red-800 rounded-full text-xs font-medium`}>
                 Sem estoque
               </div>
             )}
@@ -92,9 +225,11 @@ export function CoffeeCard({ coffee, onAddToCart }: CoffeeCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-4">
-        {/* Title and Price */}
-        <div className="flex justify-between items-start mb-2">
+      <div className="flex flex-col flex-1 p-4">
+        {/* Main Content */}
+        <div className="flex-1">
+          {/* Title and Price */}
+          <div className="flex justify-between items-start mb-2">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-amber-400 line-clamp-2">
             {coffee.name}
           </h3>
@@ -112,6 +247,11 @@ export function CoffeeCard({ coffee, onAddToCart }: CoffeeCardProps) {
         <p className="text-gray-600 dark:text-amber-400 text-sm mb-3 line-clamp-2">
           {coffee.description}
         </p>
+
+        {/* Rating */}
+        {coffee.review && coffee.review.globalRating > 0 && 
+          renderStars(coffee.review.globalRating, coffee.review.reviews.length)
+        }
 
         {/* Origin */}
         <div className="flex items-center text-sm text-gray-500 mb-3 dark:text-white">
@@ -138,42 +278,37 @@ export function CoffeeCard({ coffee, onAddToCart }: CoffeeCardProps) {
           </div>
         )}
       
-        {/* Seller */}
-        <div className="flex items-center space-x-2 mb-4">
-          {coffee.seller.photoUrl ? (
-            <Image
-              src={coffee.seller.photoUrl}
-              alt={coffee.seller.name}
-              className="h-6 w-6 rounded-full object-cover"
-              width={24}
-              height={24}
-            />
-          ) : (
-            <div className="h-6 w-6 bg-gradient-to-r dark:from-amber-500 dark:to-orange-500 from-amber-500 to-orange-500 rounded-full flex items-center justify-center">
-              <Star className="h-3 w-3 text-white" />
-            </div>
-          )}
-          <span className="text-sm text-gray-600 dark:text-white">{coffee.seller.name}</span>
+          {/* Seller */}
+          <div className="flex items-center space-x-2 mb-4">
+            {coffee.seller.photoUrl ? (
+              <Image
+                src={coffee.seller.photoUrl}
+                alt={coffee.seller.name}
+                className="h-6 w-6 rounded-full object-cover"
+                width={24}
+                height={24}
+              />
+            ) : (
+              <div className="h-6 w-6 bg-gradient-to-r dark:from-amber-500 dark:to-orange-500 from-amber-500 to-orange-500 rounded-full flex items-center justify-center">
+                <Star className="h-3 w-3 text-white" />
+              </div>
+            )}
+            <span className="text-sm text-gray-600 dark:text-white">{coffee.seller.name}</span>
+          </div>
         </div>
 
-        {/* Add to Cart Button */}
-        <button
-          onClick={() => onAddToCart(coffee)}
-          disabled={!coffee.isAvailable}
-          className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${coffee.isAvailable
-            ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600'
-            : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-            }`}
-        >
-          {coffee.isAvailable ? (
+        {/* View Details Button - Always at bottom */}
+        <div className="mt-auto">
+          <button
+            onClick={handleViewDetails}
+            className="w-full py-2 px-4 rounded-lg font-medium transition-colors bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600"
+          >
             <div className="flex items-center justify-center space-x-2">
-              <ShoppingCart className="h-4 w-4" />
-              <span>Adicionar ao Carrinho</span>
+              <Eye className="h-4 w-4" />
+              <span>Ver Detalhes</span>
             </div>
-          ) : (
-            'Indisponível'
-          )}
-        </button>
+          </button>
+        </div>
       </div>
     </div>
   );

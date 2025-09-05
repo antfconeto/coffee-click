@@ -1,10 +1,11 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCoffees } from '@/hooks/useCoffees';
 import { Header } from '@/components/layout/header/Header';
 import { CoffeeCard } from '@/components/coffee/CoffeeCard';
+import { CardCarousel3D } from '@/components/ui/carrousels/card-carousel-3d';
 import { Coffee, Loader2, AlertCircle, RefreshCw } from '@/components/icons';
 import LoaderCookie from '@/components/ui/loaders/coffee-loader';
 import { Carrousel } from '@/components/ui/carrousels/carrousel';
@@ -15,6 +16,7 @@ import { coffeeApi } from '@/api/coffee';
 
 export default function HomePage() {
   const router = useRouter();
+  const { lang } = useParams();
   const [mounted, setMounted] = useState(false);
   const { user } = useAuthContext();
   const {
@@ -68,28 +70,12 @@ export default function HomePage() {
             </div>
   
             {/* Carrossel de cafés premium */}
-            <div className="mb-16 flex items-center justify-center  mr-auto ml-auto">
-              <Carrousel
-                images={premiumCoffees.coffees.map((coffee) => coffee.medias[0].mediaUrl)}
-                height="h-120"
-                width="w-210"
-                showInfoCard={true}
-                infoCardOpacity={0.001}
-                supportVideos={true}
-                slidesInfo={premiumCoffees.coffees.map((coffee) => ({
-                  title: coffee.name,
-                  description: coffee.description,
-                  rating: coffee.review.globalRating,
-                  reviews: coffee.review.reviews.length,
-                  price: coffee.price,
-                  author: coffee.seller.name,
-                  location: coffee.origin,
-                  tags: coffee.categories.map((category) => category.name),
-                  date: coffee.createdAt,
-                  currency: coffee.currency,
-                  weight: coffee.weight,
-                  weightUnit: coffee.weightUnit
-                }))}
+            <div className="mb-34">
+              <CardCarousel3D
+                coffees={premiumCoffees.coffees.filter(coffee => coffee.medias && coffee.medias.length > 0)}
+                autoPlay={true}
+                interval={5000}
+                lang={lang as string}
               />
             </div>
   
@@ -185,7 +171,7 @@ export default function HomePage() {
                   <CoffeeCard
                     key={coffee.id}
                     coffee={coffee}
-                    onAddToCart={addToCart}
+                    lang={lang as string}
                   />
                 ))}
               </div>

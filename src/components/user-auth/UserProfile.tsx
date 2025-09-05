@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useParams } from 'next/navigation';
 import { userApi } from '@/api/user';
 import { coffeeApi } from '@/api/coffee';
 import { User } from '@/types/user';
@@ -20,6 +21,7 @@ type UserCoffeesResponse = {
 
 export default function UserProfile() {
   const { user: authUser, loading: authLoading, logout } = useAuth();
+  const { lang } = useParams();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -418,11 +420,7 @@ export default function UserProfile() {
                 <CoffeeCard
                   key={coffee.id}
                   coffee={coffee}
-                  onAddToCart={(coffee) => {
-                    // Função placeholder para adicionar ao carrinho
-                    console.log('Adicionando ao carrinho:', coffee);
-                    // TODO: Implementar funcionalidade do carrinho
-                  }}
+                  lang={lang as string}
                 />
               ))}
             </div>
